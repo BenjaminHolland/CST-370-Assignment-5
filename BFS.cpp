@@ -10,23 +10,29 @@
 #include <memory>
 #include <string>
 #include <exception>
+#include <set>
+#include <queue>
+#include <algorithm>
 using namespace std;
 
 class Graph{
 private:
+
 	unsigned int count;
 
 	//unique pointers are nice since we don't have to deal with explicit memory management.
 	unique_ptr<bool[]> adjacency;
 
 public:
+
 	//Delete the default copy constructor, since we've got a unique pointer that would need to be copied, and we don't actually need to copy a graph.
 	Graph(const Graph& copy)=delete;
 	Graph(istream& dataStream);
 	string toString() const;
+	unsigned int getCount() const;
 	void setEdge(unsigned int from,unsigned int to,bool connected);
 	bool getEdge(unsigned int from,unsigned int to) const;
-
+	set<unsigned int> getAdjacentVerticies(unsigned int currentVertex) const;
 };
 
 void testGraphConstruction(){
@@ -36,6 +42,15 @@ void testGraphConstruction(){
 	fakeFile.seekp(0);
 	Graph g(fakeFile);
 	cout<<g.toString()<<endl;
+	for(int idx=0;idx<g.getCount();idx++){
+		cout<<"Vertecies Adjacent to "<<idx<<": ";
+		set<unsigned int> adj=g.getAdjacentVerticies(idx);
+		for_each(begin(adj),end(adj),[](unsigned int adjItem){
+			cout<<adjItem<<" ";
+		});
+		cout<<endl;
+
+	}
 }
 int main(int argc,char* argv[]){
 	testGraphConstruction();
@@ -58,6 +73,10 @@ Graph::Graph(istream& dataStream){
 	}
 }
 
+
+unsigned int Graph::getCount() const{
+	return count;
+}
 string Graph::toString() const{
 	stringstream out;
 	for(int row=0;row<count;row++){
@@ -87,4 +106,14 @@ void Graph::setEdge(unsigned int from,unsigned int to,bool connected){
 			throw exception();
 		}
 		adjacency[from*count+to]=connected;
+}
+
+set<unsigned int> Graph::getAdjacentVerticies(unsigned int current) const{
+	set<unsigned int> ret;
+	for(int toIdx=0;toIdx<count;toIdx++){
+		if(getEdge(current,toIdx)){
+			ret.emplace(toIdx);
+		}
+	}
+	return ret;
 }
