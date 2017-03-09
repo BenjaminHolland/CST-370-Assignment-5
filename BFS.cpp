@@ -1,9 +1,9 @@
 /*
- * BFS.cpp
- *
- *  Created on: Mar 8, 2017
- *      Author: Benjamin
-*/
+ * Title: Homework 5 Breadth First Search Demo.
+ * Author: Benjamin Holland.
+ * ID: 4338
+ * Creation Date:  3/8/2017;
+ */
 #include <iostream>
 #include <fstream>
 #include <sstream>
@@ -27,17 +27,24 @@ public:
 
 	//Delete the default copy constructor, since we've got a unique pointer that would need to be copied, and we don't actually need to copy a graph.
 	Graph(const Graph& copy)=delete;
+
 	Graph(istream& dataStream);
+
 	string toString() const;
+
 	unsigned int getCount() const;
+
 	void setEdge(unsigned int from,unsigned int to,bool connected);
+
 	bool getEdge(unsigned int from,unsigned int to) const;
+
 	set<unsigned int> getAdjacentVerticies(unsigned int currentVertex) const;
+
+
 };
 
 void testGraphConstruction(){
 	//File presented in design document. Faked here to be a stream so we don't have to do file open checks and handling.
-
 	stringstream fakeFile("3\n0 1 0\n1 0 1\n0 1 0");
 	fakeFile.seekp(0);
 	Graph g(fakeFile);
@@ -52,8 +59,27 @@ void testGraphConstruction(){
 
 	}
 }
+
+
+void testGraphConstruction2(){
+	//File presented in design document. Faked here to be a stream so we don't have to do file open checks and handling.
+	ifstream dataStream("./sample_t2.txt");
+	Graph g(dataStream);
+	cout<<g.toString()<<endl;
+	for(int idx=0;idx<g.getCount();idx++){
+		cout<<"Vertecies Adjacent to "<<idx<<": ";
+		set<unsigned int> adj=g.getAdjacentVerticies(idx);
+		for_each(begin(adj),end(adj),[](unsigned int adjItem){
+			cout<<adjItem<<" ";
+		});
+		cout<<endl;
+
+	}
+}
+
+
 int main(int argc,char* argv[]){
-	testGraphConstruction();
+	testGraphConstruction2();
 }
 
 Graph::Graph(istream& dataStream){
