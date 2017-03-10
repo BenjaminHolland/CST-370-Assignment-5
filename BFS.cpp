@@ -24,16 +24,23 @@ public:
 	//Delete the default copy constructor, since we've got a unique pointer that would need to be copied, and we don't actually need to copy a graph.
 	Graph(const Graph& copy)=delete;
 
+	//Graph Constructor that loads data from a stram. This allows for testing as well as stream validation before attempting to load.
 	Graph(istream& dataStream);
 
+	//Ouptuts the internal adjacency matrix as a string.
 	string toString() const;
 
+	//Get the number of vertecies.
 	unsigned int getCount() const;
 
+	//Sets an edge to the specified state.
 	void setEdge(unsigned int from,unsigned int to,bool connected);
 
+	//Retrieves the state of an edge.
 	bool getEdge(unsigned int from,unsigned int to) const;
 
+	//Returns a sequence of nodes in breadth-first order, begining at the given starting node.
+	//NOTE: Only nodes connected to the starting nodes are searched.
 	string getBFTDisplay(unsigned int startingNode){
 		if(startingNode>getCount()){
 			throw exception();
@@ -68,17 +75,35 @@ public:
 };
 
 
-
+//Runs the acceptance test.
 int main(int argc,char* argv[]){
-	ifstream data("./sample_t2.txt");
+
+	string filename;
+	cout<<"Enter Filename: ";
+	cin>>filename;
+
+	ifstream data(filename);
+	if(data.fail()){
+		throw runtime_error("Invalid File Specified.");
+	}
+	unsigned int startIdx;
+	cout<<"Enter a start vertex: ";
+	cin>>startIdx;
+	if(cin.fail()){
+		throw runtime_error("Invalid Starting Index.");
+	}
 	Graph g(data);
-	cout<<g.getBFTDisplay(0)<<endl;
+
+	if(startIdx>=g.getCount()){
+		throw runtime_error("Invalid Starting Index.");
+	}
+	cout<<"BSF order: "<<g.getBFTDisplay(startIdx);
 }
 
 Graph::Graph(istream& dataStream){
 	//read the number of vertecies in the graph.
 	dataStream>>count;
-	//create a unique_pointer.
+	//create a unique_pointer. This makes sure that our memory gets destroyed automatically.
 	adjacency=make_unique<bool[]>(count*count);
 	unsigned int state;
 	for(unsigned int fromIdx=0;fromIdx<count;fromIdx++){
@@ -98,8 +123,8 @@ unsigned int Graph::getCount() const{
 
 string Graph::toString() const{
 	stringstream out;
-	for(int row=0;row<count;row++){
-		for(int col=0;col<count-1;col++){
+	for(unsigned int row=0;row<count;row++){
+		for(unsigned int col=0;col<count-1;col++){
 			out<<getEdge(row,col);
 		}
 		out<<getEdge(row,count-1)<<endl;
